@@ -72,7 +72,7 @@ local function backdoorHandler()
                         game.Players:Chat("(!)(!)(!)(!)(!)(!)(!)")
                     end
                     task.wait(0.3)
-                    game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer("/w " .. player.Name .. " i am indeed using solinium", "All")
+                    game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer("/w " .. player.Name .. " i am using jisatsu", "All")
                 end
             end)
         end
